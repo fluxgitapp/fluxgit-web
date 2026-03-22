@@ -52,7 +52,7 @@ export default function Navbar() {
 								Login
 							</Link>
 							<Link
-								href="/rsvp"
+								href="/signup"
 								className="glow-cyan border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-all px-6 py-2.5 rounded-full text-sm font-semibold"
 							>
 								Get Early Access
@@ -99,7 +99,7 @@ export default function Navbar() {
 						</Link>
 						<div className="pt-4 pb-2">
 							<Link
-								href="/rsvp"
+								href="/signup"
 								onClick={() => setIsOpen(false)}
 								className="glow-cyan border border-primary/30 bg-primary/10 text-primary inline-block px-10 py-3 rounded-full text-base font-semibold"
 							>

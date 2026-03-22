@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, TorusKnot, PerspectiveCamera, Points, PointMaterial } from "@react-three/drei";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import * as THREE from "three";
 import * as random from "maath/random/dist/maath-random.esm";
 
@@ -105,9 +106,11 @@ export default function Hero() {
 						<button className="glow-cyan border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-all px-10 py-4 rounded-full text-lg font-bold min-w-[240px]">
 							Download FluxGit v1.0.0
 						</button>
-						<button className="border border-primary/60 bg-white/5 text-text-primary hover:bg-white/10 shadow-[0_0_15px_rgba(0,212,255,0.15)] transition-all px-10 py-4 rounded-full text-lg font-semibold min-w-[200px]">
-							Request Access
-						</button>
+						<Link href="/signup">
+							<button className="border border-primary/60 bg-white/5 text-text-primary hover:bg-white/10 shadow-[0_0_15px_rgba(0,212,255,0.15)] transition-all px-10 py-4 rounded-full text-lg font-semibold min-w-[200px]">
+								Request Access
+							</button>
+						</Link>
 					</div>
 				</motion.div>
 			</div>
