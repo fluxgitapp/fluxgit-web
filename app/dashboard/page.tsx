@@ -28,12 +28,13 @@ import {
   MessageSquare,
   Check,
   RefreshCcw,
-  Camera
+  Camera,
+  LucideIcon
 } from "lucide-react";
 
 // --- Internal Components ---
 
-const SidebarItem = ({ icon: Icon, label, active, onClick, disabled = false }: { icon: React.ElementType, label: string, active: boolean, onClick: () => void, disabled?: boolean }) => (
+const SidebarItem = ({ icon: Icon, label, active, onClick, disabled = false }: { icon: LucideIcon, label: string, active: boolean, onClick: () => void, disabled?: boolean }) => (
   <button
     onClick={onClick}
     disabled={disabled}
