@@ -174,6 +174,7 @@ export default function DashboardPage() {
     if (!confirm("Are you SURE you want to delete your account? This cannot be undone.")) return;
     // Note: This only deletes Firestore data. Real auth deletion requires recent login.
     try {
+      if (!user) return;
       await deleteDoc(doc(db, "users", user.uid));
       await handleLogout();
     } catch (err) {
@@ -569,7 +570,7 @@ export default function DashboardPage() {
                        <p className="text-white/40 font-mono text-sm">{user?.email}</p>
                        <div className="mt-4 flex gap-2 justify-center md:justify-start">
                           <FeatureBadge label={userData?.role || 'User'} color="secondary" />
-                          <FeatureBadge label={userData?.status} color="primary" />
+                          <FeatureBadge label={userData?.status || 'Pending'} color="primary" />
                        </div>
                     </div>
                   </div>
