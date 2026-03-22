@@ -21,13 +21,19 @@ export const revokeUser = async (uid: string) => {
 	}, { merge: true });
 };
 
-export const onUsersChange = (callback: (users: { uid: string; email: string; status: string; role?: string; createdAt?: { seconds: number } }[]) => void) => {
+export const onUsersChange = (
+	callback: (users: { uid: string; email: string; status: string; role?: string; createdAt?: { seconds: number } }[]) => void,
+	onError?: (error: Error) => void
+) => {
 	const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
 	return onSnapshot(q, (snapshot) => {
 		const users = snapshot.docs.map(doc => ({
 			uid: doc.id,
 			...doc.data()
-		})) as any;
+		})) as { uid: string; email: string; status: string; role?: string; createdAt?: { seconds: number } }[];
 		callback(users);
+	}, (error) => {
+		console.error("Firestore onUsersChange error:", error);
+		if (onError) onError(error);
 	});
 };

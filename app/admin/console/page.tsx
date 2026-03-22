@@ -27,6 +27,7 @@ export default function AdminConsolePage() {
   const router = useRouter();
 
   useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
     const initAdmin = async () => {
       try {
         const currentUser = await getCurrentUser();
@@ -38,8 +39,10 @@ export default function AdminConsolePage() {
         const uDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (uDoc.exists() && uDoc.data().role === "admin") {
           setUser(currentUser);
-          onUsersChange((users) => {
+          unsubscribe = onUsersChange((users) => {
             setAllUsers(users);
+          }, (err) => {
+            console.error("Admin Console Listener Error:", err);
           });
         } else {
           router.push("/dashboard");
@@ -51,6 +54,10 @@ export default function AdminConsolePage() {
       }
     };
     initAdmin();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [router]);
 
   const handleLogout = async () => {
