@@ -39,6 +39,7 @@ export const signIn = async (email: string, pass: string) => {
 export const signOut = async () => {
 	await firebaseSignOut(auth);
 	Cookies.remove("fb-session");
+	Cookies.remove("fb-role");
 };
 
 // Sync auth state with cookie

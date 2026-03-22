@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { getCurrentUser, signOut } from "@/lib/auth"; // Re-added signOut and getCurrentUser
-import { approveUser, revokeUser, onUsersChange } from "@/lib/rsvp"; // Added RSVP imports
+import { getCurrentUser, signOut } from "@/lib/auth";
 import { db, storage } from "@/lib/firebase";
 import { doc, getDoc, deleteDoc, setDoc } from "firebase/firestore"; // Removed updateDoc
 import { User } from "firebase/auth";
@@ -17,16 +16,15 @@ import {
   CheckCircle2, 
   LayoutDashboard, 
   FileText, 
-  User as UserIcon, 
-  Shield, 
-  ChevronRight, 
-  ChevronDown, 
-  Lock, 
-  Trash2, 
-  AlertTriangle,
-  ExternalLink,
+  User as ProfileIcon,
+  ChevronDown,
+  ChevronRight,
+  Check as CheckIcon,
   MessageSquare,
-  Check,
+  ExternalLink,
+  Lock as LockIcon,
+  AlertTriangle,
+  Trash2,
   RefreshCcw,
   Camera,
   LucideIcon
@@ -93,7 +91,6 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState<{ status?: string; role?: string; displayName?: string; photoURL?: string; createdAt?: { seconds: number } } | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
-  const [allUsers, setAllUsers] = useState<{ uid: string; email: string; status: string; role?: string; createdAt?: { seconds: number } }[]>([]);
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -115,13 +112,6 @@ export default function DashboardPage() {
           const data = uDoc.data();
           setUserData(data);
           setDisplayName(data.displayName || "");
-          
-          // If admin, start real-time listener
-          if (data.role === "admin") {
-            onUsersChange((users) => {
-              setAllUsers(users);
-            });
-          }
         }
       } catch (err) {
         console.error("Dashboard init error:", err);
@@ -192,7 +182,6 @@ export default function DashboardPage() {
   }
 
   const isApproved = userData?.status === "approved";
-  const isAdmin = userData?.role === "admin";
 
   return (
     <div className="min-h-screen bg-[#090909] text-white flex flex-col md:flex-row overflow-hidden">
@@ -227,19 +216,11 @@ export default function DashboardPage() {
             disabled={!isApproved}
           />
           <SidebarItem 
-            icon={UserIcon} 
+            icon={ProfileIcon} 
             label="Profile" 
             active={activeTab === "profile"} 
             onClick={() => setActiveTab("profile")} 
           />
-          {isAdmin && (
-            <SidebarItem 
-              icon={Shield} 
-              label="Admin" 
-              active={activeTab === "admin"} 
-              onClick={() => setActiveTab("admin")} 
-            />
-          )}
         </nav>
 
         <div className="mt-auto pt-8">
@@ -370,7 +351,7 @@ export default function DashboardPage() {
                             <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-colors ${
                               item.done ? "bg-primary border-primary text-black" : "bg-white/5 border-white/10 text-white/20"
                             }`}>
-                              {item.done && <Check className="h-4 w-4 stroke-[3px]" />}
+                              {item.done && <CheckIcon className="h-4 w-4 stroke-[3px]" />}
                             </div>
                             <span className={`text-sm font-bold ${item.done ? "text-white/80" : "text-white/30"}`}>{item.text}</span>
                           </div>
@@ -590,7 +571,7 @@ export default function DashboardPage() {
                         <label className="text-xs uppercase font-black tracking-widest text-white/40 ml-1">Email (Locked)</label>
                         <div className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-white/30 flex items-center justify-between cursor-not-allowed">
                            <span>{user?.email}</span>
-                           <Lock className="h-4 w-4" />
+                           <LockIcon className="h-4 w-4" />
                         </div>
                      </div>
                   </div>
@@ -620,86 +601,6 @@ export default function DashboardPage() {
                 </div>
               </motion.div>
             )}
-
-            {/* ADMIN TAB */}
-            {activeTab === "admin" && isAdmin && (
-              <motion.div
-                key="admin"
-                className="space-y-12"
-              >
-                <div className="flex flex-col md:flex-row justify-between items-end border-b border-white/5 pb-8 gap-6">
-                   <div>
-                     <h1 className="text-4xl font-black italic tracking-tighter mb-2">Admin Control</h1>
-                     <p className="text-white/40">Manage user access and system oversight</p>
-                   </div>
-                   <div className="grid grid-cols-3 gap-6">
-                      <div className="text-right">
-                         <div className="text-2xl font-black text-white">{allUsers.length}</div>
-                         <div className="text-[10px] uppercase font-black text-white/20 tracking-widest">Total</div>
-                      </div>
-                      <div className="text-right">
-                         <div className="text-2xl font-black text-amber-500">{allUsers.filter(u => u.status === 'pending').length}</div>
-                         <div className="text-[10px] uppercase font-black text-white/20 tracking-widest">Pending</div>
-                      </div>
-                      <div className="text-right">
-                         <div className="text-2xl font-black text-green-500">{allUsers.filter(u => u.status === 'approved').length}</div>
-                         <div className="text-[10px] uppercase font-black text-white/20 tracking-widest">Approved</div>
-                      </div>
-                   </div>
-                </div>
-
-                <div className="glass rounded-[32px] border-white/5 overflow-hidden">
-                   <table className="w-full text-left border-collapse">
-                      <thead>
-                         <tr className="bg-white/5 border-b border-white/5">
-                            <th className="p-6 text-xs uppercase font-black tracking-[0.2em] text-white/40">User</th>
-                            <th className="p-6 text-xs uppercase font-black tracking-[0.2em] text-white/40">Status</th>
-                            <th className="p-6 text-xs uppercase font-black tracking-[0.2em] text-white/40">Joined</th>
-                            <th className="p-6 text-xs uppercase font-black tracking-[0.2em] text-white/40 text-right">Action</th>
-                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5">
-                        {allUsers.map((u) => (
-                          <tr key={u.uid} className="hover:bg-white/[0.02] transition-colors">
-                            <td className="p-6">
-                               <div className="font-bold text-white/90">{u.email}</div>
-                               <div className="text-[10px] text-white/20 font-mono italic">{u.uid}</div>
-                            </td>
-                            <td className="p-6">
-                               {u.status === "approved" ? (
-                                  <span className="text-[10px] font-black uppercase text-green-500 border border-green-500/20 bg-green-500/5 px-2 py-0.5 rounded">Approved</span>
-                               ) : (
-                                  <span className="text-[10px] font-black uppercase text-amber-500 border border-amber-500/20 bg-amber-500/5 px-2 py-0.5 rounded">Pending</span>
-                               )}
-                            </td>
-                            <td className="p-6 text-sm text-white/40">
-                               {u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
-                            </td>
-                            <td className="p-6 text-right">
-                               {u.status === "pending" ? (
-                                  <button 
-                                    onClick={() => approveUser(u.uid)}
-                                    className="px-4 py-2 bg-green-500 text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:scale-105 transition-all"
-                                  >
-                                    Approve
-                                  </button>
-                               ) : (
-                                  <button 
-                                    onClick={() => revokeUser(u.uid)}
-                                    className="px-4 py-2 border border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-500/10 transition-all font-mono"
-                                  >
-                                    Revoke
-                                  </button>
-                                )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                   </table>
-                </div>
-              </motion.div>
-            )}
-
           </AnimatePresence>
         </div>
       </main>
