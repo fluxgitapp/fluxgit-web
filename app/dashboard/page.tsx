@@ -4,11 +4,12 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { getCurrentUser, signOut } from "@/lib/auth";
 import { db, storage } from "@/lib/firebase";
-import { doc, getDoc, deleteDoc, setDoc } from "firebase/firestore"; // Removed updateDoc
+import { doc, getDoc, deleteDoc, setDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import type { FluxGitRelease } from "@/lib/releases";
 import { 
   Download as DownloadIcon, 
   LogOut, 
@@ -93,8 +94,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [release, setRelease] = useState<FluxGitRelease | null>(null);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Fetch latest release from GitHub
+    fetch("/api/latest-release")
+      .then((r) => r.json())
+      .then((data) => setRelease(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const initDashboard = async () => {
@@ -182,6 +192,14 @@ export default function DashboardPage() {
   }
 
   const isApproved = userData?.status === "approved";
+
+  // Dynamic release values
+  const version = release?.version ?? "1.0.1";
+  const releasedAt = release?.publishedAt
+    ? new Date(release.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    : "April 22, 2026";
+  const msiUrl = release?.msiUrl ?? "https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.1/FluxGit_1.0.0_x64_en-US.msi";
+  const exeUrl = release?.exeUrl ?? "https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.1/FluxGit_1.0.0_x64-setup.exe";
 
   return (
     <div className="min-h-screen bg-[#090909] text-white flex flex-col md:flex-row overflow-hidden">
@@ -298,7 +316,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="glass p-6 rounded-3xl border-white/5 bg-white/2 pt-8">
                     <div className="text-xs uppercase tracking-widest font-black text-white/30 mb-2">Build Version</div>
-                    <div className="text-3xl font-black text-white italic">v1.0.0</div>
+                    <div className="text-3xl font-black text-white italic">v{version}</div>
                   </div>
                   <div className="glass p-6 rounded-3xl border-white/5 bg-white/2 pt-8">
                     <div className="text-xs uppercase tracking-widest font-black text-white/30 mb-2">Member Since</div>
@@ -403,15 +421,15 @@ export default function DashboardPage() {
                    <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                       <div>
                         <FeatureBadge label="Latest Stable" color="primary" />
-                        <h1 className="text-5xl font-black mt-4 mb-2 italic">v1.0.0</h1>
-                        <p className="text-white/40 uppercase tracking-widest text-xs font-bold font-mono">Released March 12, 2026</p>
+                        <h1 className="text-5xl font-black mt-4 mb-2 italic">v{version}</h1>
+                        <p className="text-white/40 uppercase tracking-widest text-xs font-bold font-mono">Released {releasedAt}</p>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                        <a href="https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.0/FluxGit_1.0.0_x64_en-US.msi" target="_blank" className="glow-cyan flex items-center justify-center gap-3 bg-primary text-black font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all">
+                        <a href={msiUrl} target="_blank" rel="noopener noreferrer" className="glow-cyan flex items-center justify-center gap-3 bg-primary text-black font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all">
                            <DownloadIcon className="h-5 w-5" />
                            Download .msi
                         </a>
-                        <a href="https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.0/FluxGit_1.0.0_x64-setup.exe" target="_blank" className="flex items-center justify-center gap-3 bg-white/10 border border-white/10 text-white font-black px-8 py-4 rounded-2xl hover:bg-white/20 transition-all">
+                        <a href={exeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 bg-white/10 border border-white/10 text-white font-black px-8 py-4 rounded-2xl hover:bg-white/20 transition-all">
                            <DownloadIcon className="h-5 w-5" />
                            Download .exe
                         </a>
@@ -438,8 +456,8 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-xl border border-white/5">
                           <div className="flex items-center gap-4">
-                             <div className="text-sm font-black text-primary italic">v1.0.0</div>
-                             <div className="text-xs font-bold text-white/50">Initial Public Release</div>
+                             <div className="text-sm font-black text-primary italic">v{version}</div>
+                             <div className="text-xs font-bold text-white/50">Latest Release</div>
                           </div>
                           <div className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Active</div>
                        </div>
