@@ -22,10 +22,10 @@ export default function Download() {
 	const version = release?.version ?? "1.0.1";
 	const msiUrl =
 		release?.msiUrl ??
-		`https://github.com/fluxgitapp/fluxgit/releases/download/v${version}/FluxGit_${version}_x64_en-US.msi`;
+		`https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.1/FluxGit_1.0.0_x64_en-US.msi`;
 	const exeUrl =
 		release?.exeUrl ??
-		`https://github.com/fluxgitapp/fluxgit/releases/download/v${version}/FluxGit_${version}_x64-setup.exe`;
+		`https://github.com/fluxgitapp/fluxgit/releases/download/v1.0.1/FluxGit_1.0.0_x64-setup.exe`;
 
 	return (
 		<section id="download" className="py-24 bg-[#090909] relative overflow-hidden">
