@@ -103,9 +103,9 @@ export default function Hero() {
 					</p>
 
 					<div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-						<button className="glow-cyan border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-all px-10 py-4 rounded-full text-lg font-bold min-w-[240px]">
-							Download FluxGit v1.0.0
-						</button>
+						<a href="#download" className="glow-cyan border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-all px-10 py-4 rounded-full text-lg font-bold min-w-[240px] text-center">
+							Download FluxGit
+						</a>
 						<Link href="/signup">
 							<button className="border border-primary/60 bg-white/5 text-text-primary hover:bg-white/10 shadow-[0_0_15px_rgba(0,212,255,0.15)] transition-all px-10 py-4 rounded-full text-lg font-semibold min-w-[200px]">
 								Request Access

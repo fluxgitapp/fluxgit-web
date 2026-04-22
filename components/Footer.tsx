@@ -13,9 +13,9 @@ export default function Footer() {
 					</div>
 
 					<div className="flex items-center gap-8 text-sm font-medium text-text-muted">
-						<Link href="#" className="hover:text-primary transition-colors">GitHub</Link>
-						<Link href="#" className="hover:text-primary transition-colors">Documentation</Link>
-						<Link href="#" className="hover:text-primary transition-colors">Contact</Link>
+						<Link href="https://github.com/fluxgitapp/fluxgit" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">GitHub</Link>
+						<Link href="https://github.com/fluxgitapp/fluxgit#readme" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Documentation</Link>
+						<Link href="https://github.com/fluxgitapp/fluxgit/issues" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contact</Link>
 					</div>
 				</div>
 
